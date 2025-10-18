@@ -1,0 +1,95 @@
+# API GATEWAY CONFIGURATION
+# Routes all client requests to appropriate microservices
+
+server:
+  port: 8080  # Gateway runs on port 8080 (main entry point)
+
+spring:
+  application:
+    name: api-gateway
+  
+  cloud:
+    gateway:
+      # Discovery Locator - Automatically create routes from Eureka registered services
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      
+      # Route Configuration - Define how requests are routed to services
+      routes:
+        # Restaurant Service Routes
+        - id: restaurant-service
+          uri: lb://RESTAURANT-SERVICE  # lb = Load Balanced, uses Eureka for discovery
+          predicates:
+            - Path=/api/restaurants/**  # Match all paths starting with /api/restaurants/
+          filters:
+            - RewritePath=/api/restaurants/(?<segment>.*), /${segment}
+        
+        # User Service Routes
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /${segment}
+        
+        # Order Service Routes
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/orders/**
+          filters:
+            - RewritePath=/api/orders/(?<segment>.*), /${segment}
+        
+        # Delivery Service Routes
+        - id: delivery-service
+          uri: lb://DELIVERY-SERVICE
+          predicates:
+            - Path=/api/delivery/**
+          filters:
+            - RewritePath=/api/delivery/(?<segment>.*), /${segment}
+        
+        # Payment Service Routes
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - RewritePath=/api/payments/(?<segment>.*), /${segment}
+        
+        # Rating Service Routes
+        - id: rating-service
+          uri: lb://RATING-SERVICE
+          predicates:
+            - Path=/api/ratings/**
+          filters:
+            - RewritePath=/api/ratings/(?<segment>.*), /${segment}
+
+# Eureka Client Configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
