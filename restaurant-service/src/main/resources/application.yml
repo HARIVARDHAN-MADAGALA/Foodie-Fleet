@@ -1,0 +1,57 @@
+# RESTAURANT SERVICE CONFIGURATION
+
+server:
+  port: 8081
+
+spring:
+  application:
+    name: restaurant-service
+  
+  # MySQL Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/restaurant_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # Automatically creates/updates tables based on entities
+    show-sql: true  # Shows SQL queries in console (useful for learning)
+    properties:
+      hibernate:
+        format_sql: true  # Formats SQL for readability
+        dialect: org.hibernate.dialect.MySQLDialect
+  
+  # Redis Cache Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000  # Connection timeout in milliseconds
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # Cache entries expire after 10 minutes (in ms)
+
+# Eureka Client Configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+# Logging Configuration
+logging:
+  level:
+    com.fooddelivery.restaurant: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.cache: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
