@@ -32,9 +32,6 @@ This is a **complete, production-ready learning project** with all code and conf
 
 ### ✅ Documentation Created
 - ✓ README.md - Complete project overview
-- ✓ SETUP_GUIDE.md - Step-by-step IntelliJ setup
-- ✓ COMPLETE_SERVICES_CODE.md - All service code
-- ✓ replit.md - Project documentation
 - ✓ .gitignore - Proper Git configuration
 
 ## 📁 PROJECT STRUCTURE
@@ -122,7 +119,7 @@ food-delivery-system/
 ## 🚀 HOW TO USE THIS PROJECT
 
 ### Step 1: Copy to Your Local Machine
-This project is designed to run in **IntelliJ IDEA** on your local machine, not in Replit:
+This project is designed to run in **IntelliJ IDEA** on your local machine:
 
 1. **Download/Clone** this project to your local computer
 2. **Open IntelliJ IDEA**
@@ -295,98 +292,3 @@ cd rating-service && mvn spring-boot:run
 - **Why**: Auto-generates getters, setters, constructors
 - **Where Used**: All entity and DTO classes
 
-## ⚠️ IMPORTANT NOTES
-
-### Why This Project is NOT Running in Replit:
-1. **Requires 9 separate processes** (9 Spring Boot applications)
-2. **External dependencies**: MySQL, Redis, Kafka must run separately
-3. **Resource intensive**: Needs significant RAM and CPU
-4. **Best for IntelliJ**: Multi-module Maven projects work best in IDEs
-
-### This Project is Designed For:
-- ✅ Learning microservices architecture
-- ✅ Running on local development machine
-- ✅ IntelliJ IDEA or Eclipse
-- ✅ Step-by-step understanding of each component
-
-### Not Designed For:
-- ❌ Production deployment (needs Docker, Kubernetes)
-- ❌ Running in Replit web environment
-- ❌ Single-command startup (intentionally separate for learning)
-
-## 📖 NEXT STEPS FOR LEARNING
-
-### Phase 1: Basic Understanding (You are here!)
-- ✓ Understand project structure
-- ✓ Set up local environment
-- ✓ Run all services
-- ✓ Test complete order flow
-
-### Phase 2: Code Deep Dive
-- Read and understand each service's code
-- Modify business logic
-- Add new features (e.g., promotions, loyalty points)
-- Debug issues
-
-### Phase 3: Advanced Features
-- Add Spring Security + JWT authentication
-- Implement Circuit Breaker (Resilience4j)
-- Add distributed tracing (Sleuth + Zipkin)
-- Centralized configuration (Spring Cloud Config)
-
-### Phase 4: DevOps
-- Create Dockerfile for each service
-- Docker Compose for local multi-container setup
-- Kubernetes deployment manifests
-- CI/CD pipeline
-
-## 💡 TROUBLESHOOTING TIPS
-
-### Services won't start
-- Check if MySQL/Redis/Kafka are running
-- Verify port availability
-- Check application logs
-
-### Services not appearing in Eureka
-- Start Eureka Server first
-- Wait 30 seconds for registration
-- Check eureka.client configuration
-
-### Kafka errors
-- Ensure Zookeeper started before Kafka
-- Check Kafka broker is running on localhost:9092
-- Verify topic creation
-
-### Database errors
-- Create all 6 databases in MySQL
-- Check credentials (default: root/root)
-- Verify JDBC URLs in application.yml
-
-## 📞 GETTING HELP
-
-1. Check service logs in terminal
-2. Verify Eureka dashboard (http://localhost:8761)
-3. Test individual services before integration
-4. Use Postman/curl to test APIs
-5. Check MySQL databases for data persistence
-
----
-
-## 🎓 CONGRATULATIONS!
-
-You now have a **complete, professional-grade microservices learning project**! This project demonstrates:
-
-✅ 9 Spring Boot applications
-✅ Service Discovery & Registration
-✅ API Gateway pattern
-✅ Event-driven architecture
-✅ Distributed caching
-✅ Real-time communication
-✅ RESTful API design
-✅ Database per service pattern
-
-**Take your time to understand each component. This is a comprehensive project that covers ALL major microservices concepts!**
-
----
-
-**Happy Learning! 🚀**

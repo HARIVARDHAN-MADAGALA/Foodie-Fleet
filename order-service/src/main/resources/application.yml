@@ -8,9 +8,9 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/order_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: root
+    password: Srinurajee@1999
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,7 +19,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-  
+
   # Kafka Configuration
   kafka:
     bootstrap-servers: localhost:9092
@@ -44,6 +44,30 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Order Service
+    description: Order management with Kafka events and WebSocket real-time tracking
+    version: 1.0.0
+    port: 8083
+    features:
+      - Order creation and management
+      - Kafka event publishing
+      - WebSocket real-time tracking
+      - Order status updates
 
 logging:
   level:

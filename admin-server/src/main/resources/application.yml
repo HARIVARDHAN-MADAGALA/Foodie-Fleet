@@ -1,0 +1,62 @@
+# ADMIN SERVER CONFIGURATION
+
+server:
+  port: 9000
+
+spring:
+  application:
+    name: admin-server
+
+  # Spring Boot Admin Configuration
+  boot:
+    admin:
+      ui:
+        title: "Food Delivery - Admin Dashboard"
+        brand: "FoodieFleet Monitoring"
+      discovery:
+        enabled: true
+        ignored-services: admin-server
+
+# Eureka Client Configuration
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 10
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Application Information
+info:
+  app:
+    name: Admin Server
+    description: Spring Boot Admin Dashboard for monitoring all microservices
+    version: 1.0.0
+    port: 9000
+    features:
+      - Visual monitoring dashboard
+      - Auto-discovery via Eureka
+      - Real-time health checks
+      - Metrics visualization
+      - Log viewer
+
+# Logging Configuration
+logging:
+  level:
+    com.fooddelivery.admin: INFO
+    de.codecentric.boot.admin: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

@@ -46,8 +46,3 @@ Thumbs.db
 logs/
 application-local.properties
 application-local.yml
-
-# Replit
-.replit
-replit.nix
-.config/

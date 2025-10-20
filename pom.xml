@@ -17,6 +17,7 @@
     <modules>
         <module>eureka-server</module>
         <module>api-gateway</module>
+        <module>admin-server</module>
         <module>restaurant-service</module>
         <module>user-service</module>
         <module>order-service</module>
@@ -24,6 +25,7 @@
         <module>payment-service</module>
         <module>notification-service</module>
         <module>rating-service</module>
+        <module>admin-server</module>
     </modules>
 
     <properties>

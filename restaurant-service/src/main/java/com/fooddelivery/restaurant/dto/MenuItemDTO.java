@@ -37,4 +37,5 @@ public class MenuItemDTO {
 
     @NotNull(message = "Restaurant ID is required")
     private Long restaurantId;
+
 }

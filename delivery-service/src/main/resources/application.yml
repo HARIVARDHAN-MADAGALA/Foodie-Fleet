@@ -4,13 +4,13 @@ server:
 spring:
   application:
     name: delivery-service
-  
+
   datasource:
     url: jdbc:mysql://localhost:3306/delivery_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: root
+    password: Srinurajee@1999
     driver-class-name: com.mysql.cj.jdbc.Driver
-  
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,15 +19,9 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
-  
+
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: delivery-service-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
 
 eureka:
   client:
@@ -38,6 +32,30 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Delivery Service
+    description: Delivery partner management and assignment with Kafka events
+    version: 1.0.0
+    port: 8084
+    features:
+      - Delivery partner registration
+      - Order assignment to partners
+      - Real-time location tracking
+      - Kafka event consumption
 
 logging:
   level:
