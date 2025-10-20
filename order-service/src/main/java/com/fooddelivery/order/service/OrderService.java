@@ -1,5 +1,6 @@
 package com.fooddelivery.order.service;
 
+import com.fooddelivery.order.client.RestaurantClient;
 import com.fooddelivery.order.dto.OrderDTO;
 import com.fooddelivery.order.dto.OrderItemDTO;
 import com.fooddelivery.order.entity.Order;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 
 /**
  * ORDER SERVICE LAYER
- * 
+ *
  * Handles business logic for:
- * - Order creation and management
+ * - Order creation and management with Circuit Breaker protection
  * - Order status updates
  * - Publishing events to Kafka
  */
@@ -32,19 +33,35 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderEventProducer orderEventProducer;
+    private final RestaurantClient restaurantClient;
 
     /**
-     * CREATE NEW ORDER
-     * 
+     * CREATE NEW ORDER WITH CIRCUIT BREAKER PROTECTION
+     *
      * Flow:
-     * 1. Create order in database
-     * 2. Publish ORDER_CREATED event to Kafka
-     * 3. Payment Service listens to this event and processes payment
-     * 4. Notification Service sends order confirmation
+     * 1. Validate restaurant availability via Circuit Breaker protected call
+     * 2. Create order in database
+     * 3. Publish ORDER_CREATED event to Kafka
+     * 4. Payment Service listens to this event and processes payment
+     * 5. Notification Service sends order confirmation
+     *
+     * Circuit Breaker protects against Restaurant Service failures
      */
     @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
         log.info("Creating new order for user ID: {}", orderDTO.getUserId());
+
+        // CIRCUIT BREAKER PROTECTED CALL
+        // Validate restaurant is available before creating order
+        log.info("🔵 Validating restaurant availability with Circuit Breaker...");
+        RestaurantClient.RestaurantDTO restaurant = restaurantClient.getRestaurant(orderDTO.getRestaurantId());
+
+        if (restaurant == null || !restaurant.getAvailable()) {
+            log.error("❌ Restaurant {} is not available", orderDTO.getRestaurantId());
+            throw new RuntimeException("Restaurant is not available for orders");
+        }
+
+        log.info("✅ Restaurant validated: {}", restaurant.getName());
 
         Order order = new Order();
         order.setUserId(orderDTO.getUserId());
@@ -126,7 +143,7 @@ public class OrderService {
 
     /**
      * UPDATE ORDER STATUS
-     * 
+     *
      * Publishes status update event to Kafka
      */
     @Transactional
