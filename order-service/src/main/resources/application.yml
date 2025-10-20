@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/order_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: root
+    password: Srinurajee@1999
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
