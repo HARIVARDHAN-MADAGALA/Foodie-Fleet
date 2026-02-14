@@ -81,7 +81,7 @@ public class UserController {
      */
     @PostMapping("/{userId}/addresses")
     public ResponseEntity<AddressDTO> addAddress(
-            @PathVariable Long userId,
+            @PathVariable("userId") Long userId,
             @Valid @RequestBody AddressDTO addressDTO) {
         addressDTO.setUserId(userId);
         AddressDTO savedAddress = userService.addAddress(addressDTO);
@@ -98,8 +98,4 @@ public class UserController {
         return ResponseEntity.ok(addresses);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleException(RuntimeException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
 }

@@ -218,6 +218,18 @@ public class RestaurantService {
     }
 
     /**
+     * GET ALL MENUITEMS
+     * Cached with key "all"
+     */
+    @Cacheable(value = "menuitems", key = "'all'")
+    public List<MenuItemDTO> getAllMenuitems(){
+        List<MenuItem> menuItems = menuItemRepository.findAll();
+        log.info("Fetching all menuitems");
+
+       return menuItems.stream().map(this::convertToMenuItemDTO).collect(Collectors.toList());
+    }
+
+    /**
      * HELPER METHOD: Convert Entity to DTO
      */
     private RestaurantDTO convertToDTO(Restaurant restaurant) {

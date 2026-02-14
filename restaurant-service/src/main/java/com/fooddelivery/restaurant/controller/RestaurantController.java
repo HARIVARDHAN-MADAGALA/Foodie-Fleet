@@ -2,6 +2,7 @@ package com.fooddelivery.restaurant.controller;
 
 import com.fooddelivery.restaurant.dto.MenuItemDTO;
 import com.fooddelivery.restaurant.dto.RestaurantDTO;
+import com.fooddelivery.restaurant.entity.MenuItem;
 import com.fooddelivery.restaurant.service.RestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,19 +45,19 @@ public class RestaurantController {
 
     /**
      * CREATE NEW RESTAURANT
-     * 
+     * <p>
      * Endpoint: POST /restaurants
      * Request Body: RestaurantDTO (JSON)
      * Response: Created restaurant with ID
-     * 
+     * <p>
      * Example Request:
      * POST http://localhost:8081/restaurants
      * {
-     *   "name": "Pizza Paradise",
-     *   "cuisine": "Italian",
-     *   "address": "123 Main Street",
-     *   "phone": "1234567890",
-     *   "email": "info@pizzaparadise.com"
+     * "name": "Pizza Paradise",
+     * "cuisine": "Italian",
+     * "address": "123 Main Street",
+     * "phone": "1234567890",
+     * "email": "info@pizzaparadise.com"
      * }
      */
     @PostMapping("/restaurants")
@@ -67,11 +68,11 @@ public class RestaurantController {
 
     /**
      * GET RESTAURANT BY ID
-     * 
+     * <p>
      * Endpoint: GET /restaurants/{id}
      * Path Variable: id (restaurant ID)
      * Response: Restaurant details
-     * 
+     * <p>
      * Example: GET http://localhost:8081/restaurants/1
      */
     @GetMapping("/restaurants/{id}")
@@ -82,10 +83,10 @@ public class RestaurantController {
 
     /**
      * GET ALL RESTAURANTS
-     * 
+     * <p>
      * Endpoint: GET /restaurants
      * Response: List of all restaurants
-     * 
+     * <p>
      * Example: GET http://localhost:8081/restaurants
      */
     @GetMapping("/restaurants")
@@ -96,11 +97,11 @@ public class RestaurantController {
 
     /**
      * SEARCH RESTAURANTS BY CUISINE
-     * 
+     * <p>
      * Endpoint: GET /restaurants/cuisine/{cuisine}
      * Path Variable: cuisine (e.g., Italian, Chinese)
      * Response: List of restaurants with matching cuisine
-     * 
+     * <p>
      * Example: GET http://localhost:8081/restaurants/cuisine/Italian
      */
     @GetMapping("/restaurants/cuisine/{cuisine}")
@@ -111,11 +112,11 @@ public class RestaurantController {
 
     /**
      * SEARCH RESTAURANTS BY NAME
-     * 
+     * <p>
      * Endpoint: GET /restaurants/search?name=pizza
      * Query Parameter: name (partial name search)
      * Response: List of matching restaurants
-     * 
+     * <p>
      * Example: GET http://localhost:8081/restaurants/search?name=pizza
      */
     @GetMapping("/restaurants/search")
@@ -126,12 +127,12 @@ public class RestaurantController {
 
     /**
      * UPDATE RESTAURANT
-     * 
+     * <p>
      * Endpoint: PUT /restaurants/{id}
      * Path Variable: id (restaurant ID)
      * Request Body: Updated restaurant data
      * Response: Updated restaurant
-     * 
+     * <p>
      * Example: PUT http://localhost:8081/restaurants/1
      */
     @PutMapping("/restaurants/{id}")
@@ -144,11 +145,11 @@ public class RestaurantController {
 
     /**
      * DELETE RESTAURANT
-     * 
+     * <p>
      * Endpoint: DELETE /restaurants/{id}
      * Path Variable: id (restaurant ID)
      * Response: 204 No Content
-     * 
+     * <p>
      * Example: DELETE http://localhost:8081/restaurants/1
      */
     @DeleteMapping("/restaurants/{id}")
@@ -159,20 +160,20 @@ public class RestaurantController {
 
     /**
      * ADD MENU ITEM TO RESTAURANT
-     * 
+     * <p>
      * Endpoint: POST /restaurants/{restaurantId}/menu
      * Path Variable: restaurantId
      * Request Body: MenuItemDTO
      * Response: Created menu item
-     * 
+     * <p>
      * Example: POST http://localhost:8081/restaurants/1/menu
      * {
-     *   "name": "Margherita Pizza",
-     *   "description": "Classic pizza with tomato and mozzarella",
-     *   "price": 299.99,
-     *   "category": "Main Course",
-     *   "isVegetarian": true,
-     *   "restaurantId": 1
+     * "name": "Margherita Pizza",
+     * "description": "Classic pizza with tomato and mozzarella",
+     * "price": 299.99,
+     * "category": "Main Course",
+     * "isVegetarian": true,
+     * "restaurantId": 1
      * }
      */
     @PostMapping("/restaurants/{restaurantId}/menu")
@@ -186,11 +187,11 @@ public class RestaurantController {
 
     /**
      * GET MENU ITEMS FOR RESTAURANT
-     * 
+     * <p>
      * Endpoint: GET /restaurants/{restaurantId}/menu
      * Path Variable: restaurantId
      * Response: List of menu items
-     * 
+     * <p>
      * Example: GET http://localhost:8081/restaurants/1/menu
      */
     @GetMapping("/restaurants/{restaurantId}/menu")
@@ -202,7 +203,7 @@ public class RestaurantController {
     /**
      * UPDATE RESTAURANT RATING
      * Internal endpoint called by Rating Service
-     * 
+     * <p>
      * Endpoint: PUT /restaurants/{restaurantId}/rating
      * Request Parameter: rating value
      */
@@ -215,6 +216,21 @@ public class RestaurantController {
     }
 
     /**
+     * GET ALL MENU ITEMS
+     *
+     * Endpoint: GET /restaurants/menu
+     * Response: List of menu items
+     *
+     * Example: GET http://localhost:8081/restaurants/menu
+     */
+
+    @GetMapping("/restaurants/menu")
+    public ResponseEntity<List<MenuItemDTO>> getAllMenus(){
+        List<MenuItemDTO> menuItems = restaurantService.getAllMenuitems();
+        return ResponseEntity.ok(menuItems);
+    }
+
+    /**
      * GLOBAL EXCEPTION HANDLER
      * Catches all RuntimeExceptions and returns appropriate HTTP response
      */
@@ -222,4 +238,5 @@ public class RestaurantController {
     public ResponseEntity<String> handleException(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
 }
