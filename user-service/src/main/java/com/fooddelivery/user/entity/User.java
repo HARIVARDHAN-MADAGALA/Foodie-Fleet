@@ -12,8 +12,9 @@ import java.util.List;
 /**
  * USER ENTITY
  * 
- * Represents a customer in the food delivery system.
- * One user can have multiple delivery addresses.
+ * Represents a user in the food delivery system with authentication and authorization.
+ * Supports multiple roles: CUSTOMER, RESTAURANT, DELIVERY, ADMIN
+ * Password is encrypted using BCrypt for security.
  */
 @Entity
 @Table(name = "users")
@@ -36,7 +37,11 @@ public class User implements Serializable {
     private String phone;
 
     @Column(nullable = false)
-    private String password;  // In production, this should be encrypted!
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.CUSTOMER;
 
     @Column(nullable = false)
     private Boolean isActive = true;

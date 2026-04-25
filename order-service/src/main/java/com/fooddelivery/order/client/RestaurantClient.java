@@ -1,5 +1,6 @@
 package com.fooddelivery.order.client;
 
+import com.fooddelivery.order.exception.RestaurantServiceException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +60,9 @@ public class RestaurantClient {
     @CircuitBreaker(name = "restaurantService", fallbackMethod = "getRestaurantFallback")
     public RestaurantDTO getRestaurant(Long restaurantId) {
         log.info("🔵 Circuit Breaker: Calling Restaurant Service for restaurant ID: {}", restaurantId);
-
+//        api/restaurants/
         try {
-            String url = RESTAURANT_SERVICE_URL + "/api/restaurants/" + restaurantId;
+            String url = RESTAURANT_SERVICE_URL + "/restaurants/" + restaurantId;
             RestaurantDTO restaurant = restTemplate.getForObject(url, RestaurantDTO.class);
 
             log.info("✅ Circuit Breaker: Successfully retrieved restaurant: {}",
@@ -70,7 +71,7 @@ public class RestaurantClient {
 
         } catch (Exception e) {
             log.error("❌ Circuit Breaker: Error calling Restaurant Service: {}", e.getMessage());
-            throw e;  // Let circuit breaker handle it
+            throw new RestaurantServiceException("Failed to communicate with Restaurant Service", e);
         }
     }
 
@@ -82,21 +83,18 @@ public class RestaurantClient {
      * 2. Service throws exception
      * 3. Timeout occurs
      *
-     * Provides graceful degradation - returns cached/default data
-     * instead of failing the entire order creation
+     * Instead of returning default data, throws exception with clear message
+     * This allows proper error handling at the service layer
      */
     public RestaurantDTO getRestaurantFallback(Long restaurantId, Throwable throwable) {
-        log.warn("⚡ Circuit Breaker OPEN: Using fallback for restaurant ID: {}. Reason: {}",
+        log.error("⚡ Circuit Breaker OPEN: Fallback triggered for restaurant ID: {}. Reason: {}",
                 restaurantId, throwable.getMessage());
 
-        // Return a default/cached restaurant object
-        RestaurantDTO fallbackRestaurant = new RestaurantDTO();
-        fallbackRestaurant.setId(restaurantId);
-        fallbackRestaurant.setName("Restaurant (Service Unavailable)");
-        fallbackRestaurant.setAvailable(true);  // Assume available to allow order
-
-        log.info("🔄 Circuit Breaker: Returning fallback restaurant data");
-        return fallbackRestaurant;
+        // Throw custom exception to be handled by GlobalExceptionHandler
+        throw new RestaurantServiceException(
+                "Restaurant Service is temporarily unavailable. Circuit breaker is OPEN. Please try again later.",
+                throwable
+        );
     }
 
     /**
@@ -105,7 +103,7 @@ public class RestaurantClient {
     public static class RestaurantDTO {
         private Long id;
         private String name;
-        private Boolean available;
+        private Boolean isActive;
 
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
@@ -113,7 +111,12 @@ public class RestaurantClient {
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
 
-        public Boolean getAvailable() { return available; }
-        public void setAvailable(Boolean available) { this.available = available; }
+        public Boolean getIsActive() {
+            return isActive;
+        }
+
+        public void setIsActive(Boolean isActive) {
+            this.isActive = isActive;
+        }
     }
 }

@@ -8,6 +8,9 @@ import com.fooddelivery.order.entity.OrderItem;
 import com.fooddelivery.order.entity.OrderStatus;
 import com.fooddelivery.order.entity.PaymentStatus;
 import com.fooddelivery.order.event.OrderEvent;
+import com.fooddelivery.order.exception.InvalidOrderException;
+import com.fooddelivery.order.exception.OrderProcessingException;
+import com.fooddelivery.order.exception.ResourceNotFoundException;
 import com.fooddelivery.order.kafka.OrderEventProducer;
 import com.fooddelivery.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * ORDER SERVICE LAYER
- *
+ * 
  * Handles business logic for:
  * - Order creation and management with Circuit Breaker protection
  * - Order status updates
@@ -37,30 +40,47 @@ public class OrderService {
 
     /**
      * CREATE NEW ORDER WITH CIRCUIT BREAKER PROTECTION
-     *
+     * 
      * Flow:
      * 1. Validate restaurant availability via Circuit Breaker protected call
      * 2. Create order in database
      * 3. Publish ORDER_CREATED event to Kafka
      * 4. Payment Service listens to this event and processes payment
      * 5. Notification Service sends order confirmation
-     *
+     * 
      * Circuit Breaker protects against Restaurant Service failures
      */
     @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
         log.info("Creating new order for user ID: {}", orderDTO.getUserId());
 
+        // VALIDATE ORDER DATA
+        if (orderDTO.getItems() == null || orderDTO.getItems().isEmpty()) {
+            throw new InvalidOrderException("Order must contain at least one item");
+        }
+        
+        if (orderDTO.getUserId() == null) {
+            throw new InvalidOrderException("User ID is required");
+        }
+        
+        if (orderDTO.getRestaurantId() == null) {
+            throw new InvalidOrderException("Restaurant ID is required");
+        }
+
         // CIRCUIT BREAKER PROTECTED CALL
         // Validate restaurant is available before creating order
         log.info("🔵 Validating restaurant availability with Circuit Breaker...");
         RestaurantClient.RestaurantDTO restaurant = restaurantClient.getRestaurant(orderDTO.getRestaurantId());
-
-        if (restaurant == null || !restaurant.getAvailable()) {
-            log.error("❌ Restaurant {} is not available", orderDTO.getRestaurantId());
-            throw new RuntimeException("Restaurant is not available for orders");
+        
+        if (restaurant == null) {
+            throw new ResourceNotFoundException("Restaurant", "id", orderDTO.getRestaurantId());
         }
-
+        
+        if (!restaurant.getIsActive()) {
+            log.error("❌ Restaurant {} is not available", orderDTO.getRestaurantId());
+            throw new OrderProcessingException("Restaurant is currently not accepting orders", "RESTAURANT_UNAVAILABLE");
+        }
+        
         log.info("✅ Restaurant validated: {}", restaurant.getName());
 
         Order order = new Order();
@@ -114,7 +134,7 @@ public class OrderService {
         log.info("Fetching order with ID: {}", id);
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
 
         return convertToDTO(order);
     }
@@ -143,7 +163,7 @@ public class OrderService {
 
     /**
      * UPDATE ORDER STATUS
-     *
+     * 
      * Publishes status update event to Kafka
      */
     @Transactional
@@ -151,7 +171,7 @@ public class OrderService {
         log.info("Updating order {} status to: {}", orderId, newStatus);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         order.setStatus(newStatus);
 
@@ -184,7 +204,7 @@ public class OrderService {
         log.info("Updating payment status for order {} to: {}", orderId, paymentStatus);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         order.setPaymentStatus(paymentStatus);
 
@@ -221,7 +241,7 @@ public class OrderService {
         log.info("Assigning delivery partner {} to order {}", deliveryPartnerId, orderId);
 
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         order.setDeliveryPartnerId(deliveryPartnerId);
         order.setStatus(OrderStatus.READY);

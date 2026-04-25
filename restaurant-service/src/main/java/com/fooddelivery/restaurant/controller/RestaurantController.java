@@ -105,7 +105,7 @@ public class RestaurantController {
      * Example: GET http://localhost:8081/restaurants/cuisine/Italian
      */
     @GetMapping("/restaurants/cuisine/{cuisine}")
-    public ResponseEntity<List<RestaurantDTO>> getRestaurantsByCuisine(@PathVariable String cuisine) {
+    public ResponseEntity<List<RestaurantDTO>> getRestaurantsByCuisine(@PathVariable("cuisine") String cuisine) {
         List<RestaurantDTO> restaurants = restaurantService.getRestaurantsByCuisine(cuisine);
         return ResponseEntity.ok(restaurants);
     }

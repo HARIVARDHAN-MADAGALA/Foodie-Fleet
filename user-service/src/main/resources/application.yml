@@ -70,3 +70,7 @@ logging:
     com.fooddelivery.user: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+jwt:
+  secret: mySecretKeyForJWTTokenGenerationAndValidationMustBe256BitsLong
+  expiration: 3600000
